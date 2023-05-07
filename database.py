@@ -1,7 +1,7 @@
 import sqlite3
 def intialise_db():
     global con,cursor
-    con = sqlite3.connect("users.db")
+    con = sqlite3.connect("Data/users.db")
     cursor = con.cursor()
     cursor.execute("CREATE TABLE IF NOT EXISTS data (name varchar(48),score int);")
     con.commit()
@@ -15,10 +15,12 @@ def get_user(user):
 
     if flag==0:
         cursor.execute("INSERT INTO data VALUES ((?),0)",(user,))
-        print('Your username has been successfully registered.')
+        new_user=True
     else:
-        print(f"Welcome back {user}!")
+        new_user=False
     con.commit()
+    return new_user
+
 
 def update_score(user,points):
     cursor.execute("SELECT score FROM data WHERE name=(?)",(user,))
@@ -29,7 +31,7 @@ def update_score(user,points):
     new_score=(previous_score)+(points)
     cursor.execute("UPDATE data SET score=(?) WHERE name=(?)",(new_score,user,))
     con.commit()
-    print(f"You\'ve earned {points} points. Your new total score is {new_score}")
+    return new_score
 
 def get_score(user):
     cursor.execute("SELECT score FROM data WHERE name=(?)",(user,))
