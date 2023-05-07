@@ -5,6 +5,7 @@ import database
 #Intialize
 database.intialise_db()
 pygame.init()
+pygame.mixer.init()
 time=pygame.time.Clock()
 screen=pygame.display.set_mode((1280,720))
 pygame.display.set_caption('Hangman')
@@ -43,13 +44,43 @@ def blank_word(letters):
         display[i]='_'
     return display
 def correct_guess(guess,letters):
+    global guessed
     for key,value in letters.items():
         if value==guess:
             display_blanks[key]=guess
+            if guess not in guessed:
+                pygame.mixer.Sound.play(correct_guess_music)
+                guessed.append(guess)
     show=''
     for x in display_blanks.values():
         show= show+x+' '
     return show
+
+x_image=pygame.image.load('Media/Images/x.png').convert_alpha()
+x_rect=x_image.get_rect()
+x_rect.center=(164,85)
+
+x2_image=pygame.image.load('Media/Images/x.png').convert_alpha()
+x2_rect=x2_image.get_rect()
+x2_rect.center=(196,85)
+def hang():
+    if chance<8:
+        pygame.draw.line(screen,(0,0,0),(180,0),(180,50),4)
+    if chance<7:
+        pygame.draw.circle(screen,(0,0,0),(180,90),40,4)
+    if chance<6:
+        pygame.draw.line(screen,(0,0,0),(180,130),(180,220),4)
+    if chance<5:
+        pygame.draw.line(screen,(0,0,0),(180,140),(120,180),4)
+    if chance<4:
+        pygame.draw.line(screen, (0, 0, 0), (180, 140), (240, 180), 4)
+    if chance<3:
+        pygame.draw.line(screen,(0,0,0),(180,220),(120,270),4)
+    if chance<2:
+        pygame.draw.line(screen, (0, 0, 0), (180, 220), (240, 270), 4)
+    if chance<1:
+        screen.blit(x_image,x_rect)
+        screen.blit(x2_image,x2_rect)
 
 def give_points(letters):
     global points
@@ -96,7 +127,7 @@ def process_username():
             welcome_text = 'Your username has been successfully registered.'
         else:
             welcome_text = (f"Welcome back {username}!")
-        transition_page(welcome_text, 4000)
+        transition_page(welcome_text, 3000)
 
 
 def transition_page(text,delay):
@@ -176,13 +207,19 @@ quit_pic=pygame.image.load('Media/Images/Quit.png').convert_alpha()
 quit_rect=quit_pic.get_rect()
 quit_rect.center=(850,550)
 
+correct_guess_music=pygame.mixer.Sound('Media/Sound_effects/correct_guess.wav')
+wrong_guess_music=pygame.mixer.Sound('Media/Sound_effects/invalid_selection.mp3')
+game_over_music=pygame.mixer.Sound('Media/Sound_effects/game_over.wav')
+winning_sound=pygame.mixer.Sound('Media/Sound_effects/winning.wav')
+
 
 def gameplay():
-    global display_blanks,in_game,continue_game
+    global display_blanks,in_game,continue_game,guessed,chance
     answer=pickword(words)
     letters=splitting(answer)
     display_blanks=blank_word(letters)
     show=''
+    guessed=[]
     for x in display_blanks.values():
         show= show+x+' '
     display_blanks_text = display_blanks_font.render(show, True, (0, 0, 0))
@@ -195,16 +232,22 @@ def gameplay():
     while in_game:
         screen.blit(blank_screen, (0, 0))
 
+
         if game_status==1:
             screen.blit(guess_text, guess_rect)
             display_blanks_text = display_blanks_font.render(show, True, (0, 0, 0))
             display_blanks_rect = display_blanks_text.get_rect()
             display_blanks_rect.center = (640, 380)
             screen.blit(display_blanks_text,display_blanks_rect)
+            hang()
+            pygame.display.update()
 
         elif game_status==0:
+            pygame.mixer.Sound.play(game_over_music)
             lost_page=True
             while lost_page:
+                hang()
+
                 gameover_text=rope_font.render('Game Over!',True,(255,20,20))
                 gameover_rect=gameover_text.get_rect()
                 gameover_rect.center=(640,220)
@@ -241,6 +284,7 @@ def gameplay():
                 pygame.display.update()
 
         elif game_status==2:
+            pygame.mixer.Sound.play(winning_sound)
             won_page=True
             while won_page:
                 won_text = won_font.render('Congratulations! You\'ve Won.', True, (30, 255, 5))
@@ -278,7 +322,7 @@ def gameplay():
                             won_page=False
                             in_game=False
                             continue_game=False
-                            transition_page('Thanks for playing!', 2800)
+                            transition_page('Thanks for playing!', 2000)
                     pygame.display.update()
 
         for event in pygame.event.get():
@@ -293,6 +337,8 @@ def gameplay():
                         show=correct_guess(guess,letters)
                     else:
                         chance-=1
+                        pygame.mixer.Sound.play(wrong_guess_music)
+
             elif chance==0:
                 game_status=0
         if display_blanks==letters and given_points is False:
