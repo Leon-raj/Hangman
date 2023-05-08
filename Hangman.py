@@ -223,6 +223,13 @@ wrong_guess_music=pygame.mixer.Sound('Media/Sound_effects/invalid_selection.mp3'
 game_over_music=pygame.mixer.Sound('Media/Sound_effects/game_over.wav')
 winning_sound=pygame.mixer.Sound('Media/Sound_effects/winning.wav')
 
+won_text = won_font.render('Congratulations! You\'ve Won.', True, (30, 255, 5))
+won_rect = won_text.get_rect()
+won_rect.center = (640, 200)
+
+gameover_text = rope_font.render('Game Over!', True, (255, 20, 20))
+gameover_rect = gameover_text.get_rect()
+gameover_rect.center = (640, 220)
 
 def gameplay():
     global display_blanks,in_game,continue_game,guessed,chance
@@ -256,21 +263,20 @@ def gameplay():
         elif game_status==0:
             pygame.mixer.Sound.play(game_over_music)
             lost_page=True
+            hang()
+
+            screen.blit(gameover_text, gameover_rect)
+
+            answer_text = font2.render(f"The word was \"{answer}\"", True, (0, 0, 0))
+            answer_rect = answer_text.get_rect()
+            answer_rect.center = (640, 380)
+            screen.blit(answer_text, answer_rect)
+
+            screen.blit(retry_pic, retry_rect)
+            screen.blit(quit_pic, quit_rect)
+            pygame.display.update()
+
             while lost_page:
-                hang()
-
-                gameover_text=rope_font.render('Game Over!',True,(255,20,20))
-                gameover_rect=gameover_text.get_rect()
-                gameover_rect.center=(640,220)
-                screen.blit(gameover_text,gameover_rect)
-
-                answer_text=font2.render(f"The word was \"{answer}\"",True,(0,0,0))
-                answer_rect=answer_text.get_rect()
-                answer_rect.center=(640,380)
-                screen.blit(answer_text,answer_rect)
-
-                screen.blit(retry_pic,retry_rect)
-                screen.blit(quit_pic,quit_rect)
 
                 for event in pygame.event.get():
                     if event.type == pygame.QUIT:
@@ -291,30 +297,28 @@ def gameplay():
                             continue_game=False
                             transition_page('Thanks for playing!',2800)
 
-
-                pygame.display.update()
-
         elif game_status==2:
             pygame.mixer.Sound.play(winning_sound)
+
+            screen.blit(won_text, won_rect)
+
+            answer_text = font2.render(f"The word was indeed \"{answer}\"", True, (0, 0, 0))
+            answer_rect = answer_text.get_rect()
+            answer_rect.center = (640, 320)
+            screen.blit(answer_text, answer_rect)
+
+            score_text = font2.render(f"You\'ve earned {points} points, your new total score is {new_total_score}.",
+                                      True, (0, 0, 0))
+            score_rect = score_text.get_rect()
+            score_rect.center = (640, 390)
+            screen.blit(score_text, score_rect)
+
+            screen.blit(play_again_pic, play_again_rect)
+            screen.blit(quit_pic, quit_rect)
+            pygame.display.update()
+
             won_page=True
             while won_page:
-                won_text = won_font.render('Congratulations! You\'ve Won.', True, (30, 255, 5))
-                won_rect = won_text.get_rect()
-                won_rect.center = (640, 200)
-                screen.blit(won_text, won_rect)
-
-                answer_text=font2.render(f"The word was indeed \"{answer}\"",True,(0,0,0))
-                answer_rect=answer_text.get_rect()
-                answer_rect.center=(640,320)
-                screen.blit(answer_text,answer_rect)
-
-                score_text = font2.render(f"You\'ve earned {points} points, your new total score is {new_total_score}.", True, (0, 0, 0))
-                score_rect = score_text.get_rect()
-                score_rect.center = (640, 390)
-                screen.blit(score_text, score_rect)
-
-                screen.blit(play_again_pic,play_again_rect)
-                screen.blit(quit_pic,quit_rect)
 
                 for event in pygame.event.get():
                     if event.type == pygame.QUIT:
@@ -334,7 +338,6 @@ def gameplay():
                             in_game=False
                             continue_game=False
                             transition_page('Thanks for playing!', 2000)
-                    pygame.display.update()
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
