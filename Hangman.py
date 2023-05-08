@@ -109,10 +109,12 @@ def get_cursor():
 
 
 def get_username(event):
-    global username
+    global username,count
     if event.type==pygame.KEYDOWN:
         if event.key==pygame.K_BACKSPACE:
             username=username[:-1]
+            if count > 0:
+                count -= 1
         else:
             username+=event.unicode
 
@@ -141,17 +143,26 @@ def transition_page(text,delay):
         pygame.time.delay(delay)
         break
 def home():
-    global in_home, in_game, continue_game
+    global in_home, in_game, continue_game,count
 
     user_text_click_once=False
     user_text_click=False
+
+    count=0
 
     while in_home:
         #display
         screen.blit(home_screen,(0,0))
         if user_text_click_once:
             screen.blit(textbox, (536, 305))
-        display_username=font.render((username),True,(0,0,0))
+
+        username_copy = username[count:len(username)+1]
+        display_username=font.render((username_copy),True,(0,0,0))
+        username_rect=display_username.get_rect()
+
+        if username_rect.right>165:
+            count+=1
+
         screen.blit(display_username,(560,315))
 
         for event in pygame.event.get():
