@@ -307,8 +307,7 @@ def gameplay():
             answer_rect.center = (640, 320)
             screen.blit(answer_text, answer_rect)
 
-            score_text = font2.render(f"You\'ve earned {points} points, your new total score is {new_total_score}.",
-                                      True, (0, 0, 0))
+            score_text = font2.render(f"You\'ve earned {points} points, your new total score is {new_total_score}.",True, (0, 0, 0))
             score_rect = score_text.get_rect()
             score_rect.center = (640, 390)
             screen.blit(score_text, score_rect)
