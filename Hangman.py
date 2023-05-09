@@ -202,6 +202,7 @@ blank_screen=pygame.image.load('Media/Images/blank_background.png').convert()
 guess_text=font2.render('Enter a letter to guess',True,(0,0,0))
 guess_rect=guess_text.get_rect()
 guess_rect.center = (640, 260)
+
 display_blanks_font=pygame.font.Font('Media/Fonts/Raleway-SemiBoldItalic.ttf', 38)
 rope_font=pygame.font.Font('Media/Fonts/Reeperbahn.ttf', 160)
 won_font=pygame.font.Font('Media/Fonts/Reeperbahn.ttf', 120)
@@ -262,7 +263,7 @@ def gameplay():
 
         elif game_status==0:
             pygame.mixer.Sound.play(game_over_music)
-            lost_page=True
+
             hang()
 
             screen.blit(gameover_text, gameover_rect)
@@ -276,6 +277,7 @@ def gameplay():
             screen.blit(quit_pic, quit_rect)
             pygame.display.update()
 
+            lost_page = True
             while lost_page:
 
                 for event in pygame.event.get():
